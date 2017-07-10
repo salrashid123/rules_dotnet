@@ -1,0 +1,25 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
+
+filegroup(
+    name = "dotnet_exe",
+    srcs = [ 
+        "dotnet",
+    ],
+)
+
+filegroup(
+    name = "nuget_file",
+    srcs = [
+        "NuGet.Config",
+    ],
+)
+
+#genrule(
+#    name = "regen_csproj_file",
+#    srcs = ["myNuGet.Config"],
+#    outs = ["NuGet.Config"],
+#    cmd = "echo myNuGet.Config > $@"
+#)
