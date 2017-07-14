@@ -1,2 +1,2 @@
 # https://docs.bazel.build/versions/master/bazel-user-manual.html#strategy-options
-build --genrule_strategy=standalone --spawn_strategy=standalone
+ build --genrule_strategy=standalone --spawn_strategy=standalone

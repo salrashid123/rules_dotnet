@@ -1,10 +1,18 @@
-load("//dotnet:csharp.bzl", "dotnet_restore")
+load("//dotnet:csharp.bzl", "dotnet_binary")
 
-dotnet_restore(
-    name = "hello",
+
+filegroup(
+    name = "dotnet_srcs",
     srcs = glob([
         "*.csproj",
     ]),
+)
+
+dotnet_binary(
+    name = "hello",
+    srcs = [
+        ":dotnet_srcs",
+    ],
 )
 
 

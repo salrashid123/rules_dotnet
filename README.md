@@ -16,3 +16,9 @@ $ bazel build examples/example_binary:hello
   [https://gist.github.com/salrashid123/2230042d0789867b6e90d817b609d518](https://gist.github.com/salrashid123/2230042d0789867b6e90d817b609d518)
 
 
+- 7/14/18:  downloads coreclr, restores packages to
+    ~examples/example_binary
+    - todo: figure out how to emit/track the restore outputs...
+
+    ![alt text](images/build_output1.png)
+  
