@@ -9,17 +9,17 @@ def binary_impl(ctx):
     print(ctx.attr.srcs[0].files.to_list()[0])
 
     ctx.action(
-        #env = {'HOME': str(ctx.files._dotnet_exe[0].short_path), 'DOTNET_CLI_TELEMETRY_OPTOUT': "1"  },
         env = {'HOME': ctx.outputs.staging_folder.path, 'DOTNET_CLI_TELEMETRY_OPTOUT': "1"  },        
         progress_message="Restoring dotnet dependencies",
+        inputs=ctx.files.srcs,
         arguments=[
             'msbuild',
             '/m',
             '/t:Restore', 
-            
+          
             '/p:RestorePackagesPath=' + ctx.outputs.staging_folder.path + '/pkg',
             '/p:RestoreOutputPath=' + ctx.outputs.staging_folder.path + '/obj' , 
-                        
+
             '/v:m',
             ctx.attr.srcs[0].files.to_list()[0].short_path,
         ],     
