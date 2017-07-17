@@ -8,6 +8,17 @@ see [issue #39](https://github.com/bazelbuild/rules_dotnet/issues/39)
 
 ** DO NOT USE (this is a work in progress; doesn't work yet (at all!)) **
 
+
+   - [build](#build)
+   - [Log](#log)
+     - [7-10-18](#7-10-18)
+     - [7-14-18](#7-14-18)
+     - [7-16-18](#7-16-18)          
+   - [Appendix](#appendix)
+     - [Restore](#restore)
+     - [Build](#build)
+     - [Publish](#publish)          
+
 # build
 ```
 $ bazel build examples/example_binary:hello
@@ -15,18 +26,18 @@ $ bazel build examples/example_binary:hello
 
 # Log
 
-## 7/10/18: 
+## 7-10-18: 
    - Currently just downloads and restores the dependencies in .csproj file.
    lock files updated to home directory outside of bazel, need to address that:
   [https://gist.github.com/salrashid123/2230042d0789867b6e90d817b609d518](https://gist.github.com/salrashid123/2230042d0789867b6e90d817b609d518)
 
 
-## 7/14/18:
+## 7-14-18:
   - downloads coreclr, restores packages to
     ~examples/example_binary
   - todo: figure out how to emit/track the restore outputs...
 
-## 7/16/18:
+## 7-16-18:
   - Got build+restore+publish setup with dotnet and msbuild (see appendix)
   - add config to restore .sln and .csproj files (TODO: figure out how to actually restore .sln files)
   - build dll now restores and installs dependencies.  However, the output .dll isn't detected..
