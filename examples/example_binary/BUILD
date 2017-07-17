@@ -4,7 +4,6 @@ load("//dotnet:csharp.bzl", "dotnet_library")
 filegroup(
     name = "dotnet_srcs",
     srcs = glob([
-        "*.sln",
         "*.csproj",
         "*.cs",
     ]),

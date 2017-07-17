@@ -4,10 +4,10 @@ def library_impl(ctx):
     args = [f.path for f in ctx.files.srcs]
      
     for f in args:     
-      if (f.endswith(".csproj") or f.endswith(".sln") ):
+      if (f.endswith(".csproj")):
         print("Building: " + f)
 
-        #obj = ctx.declare_directory("obj")
+        #obj = ctx.actions.declare_directory("obj")
         #obj = ctx.new_file(ctx.genfiles_dir, "obj")
         #pkg = ctx.new_file(ctx.genfiles_dir, "pkg")
 
@@ -18,7 +18,7 @@ def library_impl(ctx):
         print(ctx.bin_dir.path + '\n')
         
         ctx.action(
-            env = {'HOME': ctx.genfiles_dir.path, 'DOTNET_CLI_TELEMETRY_OPTOUT': "1"  },        
+            env = {'HOME': ctx.genfiles_dir.path, 'DOTNET_CLI_TELEMETRY_OPTOUT': "1"  },                 
             progress_message="Restoring dotnet dependencies",
             inputs=ctx.files.srcs,
             arguments=[
