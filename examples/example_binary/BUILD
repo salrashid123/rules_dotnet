@@ -1,18 +1,23 @@
-load("//dotnet:csharp.bzl", "dotnet_binary")
+load("//dotnet:csharp.bzl", "dotnet_library")
 
 
 filegroup(
     name = "dotnet_srcs",
     srcs = glob([
+        "*.sln",
         "*.csproj",
+        "*.cs",
     ]),
 )
 
-dotnet_binary(
+dotnet_library(
     name = "hello",
     srcs = [
         ":dotnet_srcs",
     ],
+    runtime = "ubuntu.14.04-x64",
+    configuration = "Debug",
+    out =  "bin/Debug/netcoreapp2.0/example_binary.dll",
 )
 
 

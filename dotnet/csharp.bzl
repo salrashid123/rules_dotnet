@@ -1,43 +1,52 @@
 
-def binary_impl(ctx):
+def library_impl(ctx):
 
-    #args = [f.path for f in ctx.files.srcs]
-    #f = ctx.new_file("obj/project.assets.json")
+    args = [f.path for f in ctx.files.srcs]
+     
+    for f in args:     
+      if (f.endswith(".csproj") or f.endswith(".sln") ):
+        print("Building: " + f)
 
-    print(ctx.outputs.staging_folder.path + '\n')    
-    print(ctx.bin_dir.path + '\n')
-    print(ctx.attr.srcs[0].files.to_list()[0])
+        #obj = ctx.declare_directory("obj")
+        #obj = ctx.new_file(ctx.genfiles_dir, "obj")
+        #pkg = ctx.new_file(ctx.genfiles_dir, "pkg")
 
-    ctx.action(
-        env = {'HOME': ctx.outputs.staging_folder.path, 'DOTNET_CLI_TELEMETRY_OPTOUT': "1"  },        
-        progress_message="Restoring dotnet dependencies",
-        inputs=ctx.files.srcs,
-        arguments=[
-            'msbuild',
-            '/m',
-            '/t:Restore', 
-          
-            '/p:RestorePackagesPath=' + ctx.outputs.staging_folder.path + '/pkg',
-            '/p:RestoreOutputPath=' + ctx.outputs.staging_folder.path + '/obj' , 
+        #print(obj.path + '\n')
+        #print(pkg.path + '\n') 
 
-            '/v:m',
-            ctx.attr.srcs[0].files.to_list()[0].short_path,
-        ],     
-        executable = ctx.executable._dotnet_exe,        
- 
-        outputs = [ctx.outputs.staging_folder]        
-    )
+        print(ctx.outputs.out.path + '\n')    
+        print(ctx.bin_dir.path + '\n')
+        
+        ctx.action(
+            env = {'HOME': ctx.genfiles_dir.path, 'DOTNET_CLI_TELEMETRY_OPTOUT': "1"  },        
+            progress_message="Restoring dotnet dependencies",
+            inputs=ctx.files.srcs,
+            arguments=[
+                'msbuild',
+                '/m',
+                '/t:Restore,Build', 
+                '/p:RuntimeIdentifiers=' + ctx.attr.runtime,
+                '/p:Configuration=' + ctx.attr.configuration,
+                '/v:m',
+                f
+            ],     
+            executable = ctx.executable._dotnet_exe, 
+            outputs = [ ctx.outputs.out ],
+        )
+        #ctx.file_action(output=pkg, content="blah", executable=False)
+        #return struct(runfiles=ctx.runfiles([obj]))     
 
 
-dotnet_binary = rule(
-    implementation=binary_impl,
+dotnet_library = rule(
+    implementation=library_impl,
     attrs={        
       "_dotnet_exe": attr.label(default=Label("@dotnet//:dotnet_exe"), single_file=True, executable=True, cfg="host"),
       "runtime":  attr.string(default="ubuntu.14.04-x64"),     
-      "srcs": attr.label_list(allow_files = FileType([".cs", ".csproj"])),
+      "configuration":  attr.string(default="Debug"),      
+      "srcs": attr.label_list(allow_files = FileType([".sln", ".cs", ".csproj"])),
+      "out": attr.output(mandatory=True),             
     },    
-     outputs = {"staging_folder":"staging"},       
-    )
+)
 
 
 def _find_and_symlink(repository_ctx, binary, env_variable):
