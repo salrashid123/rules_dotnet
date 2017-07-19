@@ -14,7 +14,8 @@ see [issue #39](https://github.com/bazelbuild/rules_dotnet/issues/39)
      - [7-10-17](#7-10-17)
      - [7-14-17](#7-14-17)
      - [7-16-17](#7-16-17)
-     - [7-17-17](#7-16-17)             
+     - [7-17-17](#7-17-17)
+     - [7-19-17](#7-19-17)                  
    - [Appendix](#appendix)
      - [Restore](#restore)
      - [Build](#build)
@@ -96,6 +97,48 @@ example_binary.csproj:
 </ItemGroup>
 ```
 
+## 7-19-17:
+
+- Removed unecessary donet cli initializatoin
+- Added /p:OutputDire=bin  to msbuild
+- Still unable to map  generated file
+
+```
+/home/srashid/.cache/bazel/_bazel_srashid/074efdfd083fa382423f186b413a3f8a/bazel-sandbox/4615100056060896496/execroot/io_bazel_rules_dotnet/examples/example_binary/bin/example_binary.dll
+```
+
+to the declared output....
+
+```
+/home/srashid/Desktop/rules_dotnet/examples/example_binary/BUILD:12:1: output 'examples/example_binary/bin/example_binary.dll' was not created.
+```
+
+
+```
+dotnet_library = rule(
+    implementation=library_impl,
+    attrs={        
+      "_dotnet_exe": attr.label(default=Label("@dotnet//:dotnet_exe"), single_file=True, executable=True, cfg="host"),
+      "runtime":  attr.string(default="ubuntu.14.04-x64"),     
+      "configuration":  attr.string(default="Debug"),      
+      "srcs": attr.label_list(allow_files = FileType([".sln", ".cs", ".csproj"])),
+      "out": attr.output(mandatory=True),             
+    },    
+)
+```
+
+```
+dotnet_library(
+    name = "hello",
+    srcs = [
+        ":dotnet_srcs",
+    ],
+    runtime = "ubuntu.14.04-x64",
+    configuration = "Debug",
+    out =  "bin/example_binary.dll",
+)
+
+```
 
 # Appendix
 

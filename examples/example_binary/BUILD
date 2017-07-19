@@ -16,7 +16,7 @@ dotnet_library(
     ],
     runtime = "ubuntu.14.04-x64",
     configuration = "Debug",
-    out =  "bin/Debug/netcoreapp2.0/example_binary.dll",
+    out =  "bin/example_binary.dll",
 )
 
 

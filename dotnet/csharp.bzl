@@ -24,7 +24,8 @@ def library_impl(ctx):
             arguments=[
                 'msbuild',
                 '/m',
-                '/t:Restore,Build', 
+                '/t:Restore,Build',
+                '/p:OutputPath=bin',
                 '/p:RuntimeIdentifiers=' + ctx.attr.runtime,
                 '/p:Configuration=' + ctx.attr.configuration,
                 '/v:m',
@@ -34,7 +35,7 @@ def library_impl(ctx):
             outputs = [ ctx.outputs.out ],
         )
         #ctx.file_action(output=pkg, content="blah", executable=False)
-        #return struct(runfiles=ctx.runfiles([obj]))     
+        #return struct(runfiles=ctx.runfiles([ctx.outputs.out]))     
 
 
 dotnet_library = rule(
@@ -49,39 +50,6 @@ dotnet_library = rule(
 )
 
 
-def _find_and_symlink(repository_ctx, binary, env_variable):
-  repository_ctx.file("bin/empty")
-  if env_variable in repository_ctx.os.environ:
-    return repository_ctx.path(repository_ctx.os.environ[env_variable])
-  else:
-    found_binary = repository_ctx.which(binary)
-    if found_binary == None:
-      fail("Cannot find %s. Either correct your path or set the " % binary +
-           "%s environment variable." % env_variable)
-    repository_ctx.symlink(found_binary, "bin/%s" % binary)
-
-def _csharp_autoconf(repository_ctx):
-  _find_and_symlink(repository_ctx, "dotnet", "DOTNET")
-  toolchain_build = """\
-package(default_visibility = ["//visibility:public"])
-exports_files(["dotnet", "DOTNET"])
-"""
-  repository_ctx.file("bin/BUILD", toolchain_build)
-
-def _coreclr_repository_impl(repository_ctx):
-  use_local = repository_ctx.os.environ.get(
-    "RULES_DOTNET_USE_LOCAL_DOTNET", repository_ctx.attr.use_local)
-  _csharp_autoconf(repository_ctx)
-  return
-
-coreclr_package = repository_rule(
-  implementation = _coreclr_repository_impl,
-  attrs = {
-    "use_local": attr.bool(default=False),
-  },
-  local = True,
-)
-
 def csharp_repositories(use_local_mono=False):
   native.new_http_archive(
           name = "dotnet",
@@ -90,5 +58,3 @@ def csharp_repositories(use_local_mono=False):
           type = "tgz",
           url = "https://download.microsoft.com/download/0/6/5/0656B047-5F2F-4281-A851-F30776F8616D/dotnet-dev-linux-x64.2.0.0-preview1-005977.tar.gz",
   )
-
-  coreclr_package(name="coreclr")
