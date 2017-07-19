@@ -16,7 +16,14 @@ def library_impl(ctx):
 
         print(ctx.outputs.out.path + '\n')    
         print(ctx.bin_dir.path + '\n')
+        print(ctx.outputs.out.dirname + '\n')        
         
+
+        dir_arr = ctx.outputs.out.dirname.split('/')[4:]
+        prefix = ''
+        for i in dir_arr:
+          prefix = prefix + '../'
+
         ctx.action(
             env = {'HOME': ctx.genfiles_dir.path, 'DOTNET_CLI_TELEMETRY_OPTOUT': "1"  },                 
             progress_message="Restoring dotnet dependencies",
@@ -25,7 +32,7 @@ def library_impl(ctx):
                 'msbuild',
                 '/m',
                 '/t:Restore,Build',
-                '/p:OutputPath=bin',
+                '/p:OutputPath={prefix}{output_dir}'.format(prefix=prefix,output_dir = ctx.outputs.out.dirname),
                 '/p:RuntimeIdentifiers=' + ctx.attr.runtime,
                 '/p:Configuration=' + ctx.attr.configuration,
                 '/v:m',

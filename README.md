@@ -15,7 +15,8 @@ see [issue #39](https://github.com/bazelbuild/rules_dotnet/issues/39)
      - [7-14-17](#7-14-17)
      - [7-16-17](#7-16-17)
      - [7-17-17](#7-17-17)
-     - [7-19-17](#7-19-17)                  
+     - [7-19-17](#7-19-17)    
+     - 7-19-17_2(#7-19-17_2)               
    - [Appendix](#appendix)
      - [Restore](#restore)
      - [Build](#build)
@@ -113,31 +114,33 @@ to the declared output....
 /home/srashid/Desktop/rules_dotnet/examples/example_binary/BUILD:12:1: output 'examples/example_binary/bin/example_binary.dll' was not created.
 ```
 
+### 7-19-17_2:
+
+Added prefix to output directory (atleast now it builds and finds the output)
 
 ```
-dotnet_library = rule(
-    implementation=library_impl,
-    attrs={        
-      "_dotnet_exe": attr.label(default=Label("@dotnet//:dotnet_exe"), single_file=True, executable=True, cfg="host"),
-      "runtime":  attr.string(default="ubuntu.14.04-x64"),     
-      "configuration":  attr.string(default="Debug"),      
-      "srcs": attr.label_list(allow_files = FileType([".sln", ".cs", ".csproj"])),
-      "out": attr.output(mandatory=True),             
-    },    
-)
-```
+        dir_arr = ctx.outputs.out.dirname.split('/')[4:]
+        prefix = ''
+        for i in dir_arr:
+          prefix = prefix + '../'
 
-```
-dotnet_library(
-    name = "hello",
-    srcs = [
-        ":dotnet_srcs",
-    ],
-    runtime = "ubuntu.14.04-x64",
-    configuration = "Debug",
-    out =  "bin/example_binary.dll",
-)
-
+        ctx.action(
+            env = {'HOME': ctx.genfiles_dir.path, 'DOTNET_CLI_TELEMETRY_OPTOUT': "1"  },                 
+            progress_message="Restoring dotnet dependencies",
+            inputs=ctx.files.srcs,
+            arguments=[
+                'msbuild',
+                '/m',
+                '/t:Restore,Build',
+                '/p:OutputPath={prefix}{output_dir}'.format(prefix=prefix,output_dir = ctx.outputs.out.dirname),
+                '/p:RuntimeIdentifiers=' + ctx.attr.runtime,
+                '/p:Configuration=' + ctx.attr.configuration,
+                '/v:m',
+                f
+            ],     
+            executable = ctx.executable._dotnet_exe, 
+            outputs = [ ctx.outputs.out ],
+        )
 ```
 
 # Appendix
